@@ -86,6 +86,10 @@ class View
 
 	$focus()
 	{
+		if (this.element.getAttribute("data-focus") === "nofocus") {
+			return false;
+		}
+
 		var f = Core().Focus;
 		var n:any = this.element.firstChild;
 		while (n) {
@@ -98,14 +102,11 @@ class View
 			n = n.nextSibling;
 		}
 
-		if (this.element.getAttribute("data-focus") !== "nofocus") {
-			if (!this.$hasClass("focused")) {
-				this.$addClass("focused");
-				this.$signal("$focus");
-			}
-			return true;
+		if (!this.$hasClass("focused")) {
+			this.$addClass("focused");
+			this.$signal("$focus");
 		}
-		return false;
+		return true;
 	}
 
 	$blur()
@@ -234,7 +235,7 @@ class View
 
 	$onLeftKey(node?)
 	{
-		if (this.orientation === "horizontal") {
+		if (this.orientation.indexOf("horizontal") >= 0) {
 			if (node) {
 				var sibling:any = node.previousSibling;
 				while (sibling) {
@@ -249,13 +250,20 @@ class View
 				}
 			}
 		}
+
 		var p:any = this.element.parentNode;
-		if (p && p.$onLeftKey) p.$onLeftKey(this.element);
+		while (p) {
+			if (p && p.$onDownKey) {
+				p.$onLeftKey(this.element);
+				break;
+			}
+			p = p.parentNode;
+		}
 	}
 
 	$onRightKey(node?)
 	{
-		if (this.orientation === "horizontal") {
+		if (this.orientation.indexOf("horizontal") >= 0) {
 			if (node) {
 				var sibling:any = node.nextSibling;
 				while (sibling) {
@@ -270,13 +278,20 @@ class View
 				}
 			}
 		}
+
 		var p:any = this.element.parentNode;
-		if (p && p.$onRightKey) p.$onRightKey(this.element);
+		while (p) {
+			if (p && p.$onDownKey) {
+				p.$onRightKey(this.element);
+				break;
+			}
+			p = p.parentNode;
+		}
 	}
 
 	$onUpKey(node?)
 	{
-		if (this.orientation === "vertical") {
+		if (this.orientation.indexOf("vertical") >= 0) {
 			if (node) {
 				var sibling:any = node.previousSibling;
 				while (sibling) {
@@ -291,13 +306,20 @@ class View
 				}
 			}
 		}
+
 		var p:any = this.element.parentNode;
-		if (p && p.$onUpKey) p.$onUpKey(this.element);
+		while (p) {
+			if (p && p.$onDownKey) {
+				p.$onUpKey(this.element);
+				break;
+			}
+			p = p.parentNode;
+		}
 	}
 
 	$onDownKey(node?)
 	{
-		if (this.orientation === "vertical") {
+		if (this.orientation.indexOf("vertical") >= 0) {
 			if (node) {
 				var sibling:any = node.nextSibling;
 				while (sibling) {
@@ -312,8 +334,15 @@ class View
 				}
 			}
 		}
+
 		var p:any = this.element.parentNode;
-		if (p && p.$onDownKey) p.$onDownKey(this.element);
+		while (p) {
+			if (p && p.$onDownKey) {
+				p.$onDownKey(this.element);
+				break;
+			}
+			p = p.parentNode;
+		}
 	}
 
 	$onEnterKey()
